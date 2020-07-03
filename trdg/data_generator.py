@@ -147,7 +147,7 @@ class FakeTextDataGenerator(object):
         # Place text with alignment #
         #############################
 
-        new_text_height, new_text_width = resized_img.shape
+        new_text_height, new_text_width = resized_img.shape[:1]
         if alignment == 0 or width == -1:
             background_img[margin_top: margin_top + new_text_height, margin_left: margin_left + new_text_width] = resized_img
         elif alignment == 1:
