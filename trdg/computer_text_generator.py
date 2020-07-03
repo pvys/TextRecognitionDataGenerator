@@ -59,11 +59,8 @@ def _generate_horizontal_text(
     text_height = max([image_font.getsize(p)[1] for p in splitted_text])
 
     txt_img = Image.new("RGBA", (text_width, text_height), (0, 0, 0, 0))
-    txt_mask = Image.new("RGB", (text_width, text_height), (0, 0, 0))
 
     txt_img_draw = ImageDraw.Draw(txt_img)
-    txt_mask_draw = ImageDraw.Draw(txt_mask, mode="RGB")
-    txt_mask_draw.fontmode = "1"
 
     colors = [ImageColor.getrgb(c) for c in text_color.split(",")]
     c1, c2 = colors[0], colors[-1]
@@ -81,17 +78,11 @@ def _generate_horizontal_text(
             fill=fill,
             font=image_font,
         )
-        txt_mask_draw.text(
-            (sum(piece_widths[0:i]) + i * character_spacing * int(not word_split), 0),
-            p,
-            fill=((i + 1) // (255 * 255), (i + 1) // 255, (i + 1) % 255),
-            font=image_font,
-        )
 
     if fit:
-        return txt_img.crop(txt_img.getbbox()), txt_mask.crop(txt_img.getbbox())
+        return txt_img.crop(txt_img.getbbox())
     else:
-        return txt_img, txt_mask
+        return txt_img
 
 
 def _generate_vertical_text(

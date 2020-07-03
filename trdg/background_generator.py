@@ -18,7 +18,7 @@ def gaussian_noise(height, width):
     # We add gaussian noise
     cv2.randn(image, 235, 10)
 
-    return Image.fromarray(image).convert("RGBA")
+    return image
 
 
 def plain_white(height, width):
@@ -26,8 +26,7 @@ def plain_white(height, width):
         Create a plain white background
     """
 
-    return Image.new("L", (width, height), 255).convert("RGBA")
-
+    return np.ones((height, width)) * 255
 
 def quasicrystal(height, width):
     """
@@ -55,35 +54,23 @@ def quasicrystal(height, width):
     return image.convert("RGBA")
 
 
-def image(height, width, image_dir):
+def image(height, width, image_path):
     """
         Create a background with a image
     """
-    images = os.listdir(image_dir)
+    pic = cv2.imread(image_path)
 
-    if len(images) > 0:
-        pic = Image.open(
-            os.path.join(image_dir, images[rnd.randint(0, len(images) - 1)])
-        )
-
-        if pic.size[0] < width:
-            pic = pic.resize(
-                [width, int(pic.size[1] * (width / pic.size[0]))], Image.ANTIALIAS
-            )
-        if pic.size[1] < height:
-            pic = pic.resize(
-                [int(pic.size[0] * (height / pic.size[1])), height], Image.ANTIALIAS
-            )
-
-        if pic.size[0] == width:
-            x = 0
-        else:
-            x = rnd.randint(0, pic.size[0] - width)
-        if pic.size[1] == height:
-            y = 0
-        else:
-            y = rnd.randint(0, pic.size[1] - height)
-
-        return pic.crop((x, y, x + width, y + height))
+    if pic.shape[1] < width:
+        pic = cv2.resize(pic, dsize=(width, int(pic.shape[0] * (width / pic.shape[1]))), interpolation=cv2.INTER_AREA)
+    if pic.shape[0] < height:
+        pic = cv2.resize(pic, dsize=( int(pic.shape[1] * (height / pic.shape[0])), height), interpolation=cv2.INTER_AREA)
+    if pic.shape[1] == width:
+        x = 0
     else:
-        raise Exception("No images where found in the images folder!")
+        x = rnd.randint(0, pic.shape[1] - width)
+    if pic.shape[0] == height:
+        y = 0
+    else:
+        y = rnd.randint(0, pic.shape[0] - height)
+
+    return pic[y: y + height, x: x + width]
