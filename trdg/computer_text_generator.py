@@ -58,7 +58,7 @@ def _generate_horizontal_text(
 
     text_height = max([image_font.getsize(p)[1] for p in splitted_text])
 
-    txt_img = Image.new("RGBA", (text_width, text_height), (0, 0, 0, 0))
+    txt_img = Image.new("RGB", (text_width, text_height), (0, 0, 0))
 
     txt_img_draw = ImageDraw.Draw(txt_img)
 

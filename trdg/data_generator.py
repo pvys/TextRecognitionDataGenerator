@@ -147,9 +147,9 @@ class FakeTextDataGenerator(object):
         # Place text with alignment #
         #############################
 
-        new_text_height, new_text_width = resized_img.shape[:1]
+        new_text_height, new_text_width = resized_img.shape[:2]
         if alignment == 0 or width == -1:
-            background_img[margin_top: margin_top + new_text_height, margin_left: margin_left + new_text_width] = resized_img
+            background_img[margin_top: margin_top + new_text_height, margin_left: margin_left + new_text_width, :] = resized_img
         elif alignment == 1:
             left_from = int(background_width / 2 - new_text_width / 2)
             background_img[margin_top: margin_top + new_text_height, left_from: left_from + new_text_width] = resized_img
@@ -161,7 +161,12 @@ class FakeTextDataGenerator(object):
         # Apply gaussian blur #
         ##################################
         radius = blur if not random_blur else rnd.randint(0, blur)
-        final_image = cv2.GaussianBlur(background_img, (radius, radius), 0)
+        if radius % 2 == 0:
+            radius -= 1
+        if radius == -1:
+            final_image = background_img
+        else:
+            final_image = cv2.GaussianBlur(background_img, (radius, radius), 0)
 
         return final_image, text
 
