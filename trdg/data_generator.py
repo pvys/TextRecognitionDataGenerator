@@ -23,12 +23,9 @@ class FakeTextDataGenerator(object):
     @classmethod
     def generate(
         cls,
-        index,
         text,
         font,
-        out_dir,
         size,
-        extension,
         skewing_angle,
         random_skew,
         blur,
@@ -37,7 +34,6 @@ class FakeTextDataGenerator(object):
         distorsion_type,
         distorsion_orientation,
         is_handwritten,
-        name_format,
         width,
         alignment,
         text_color,
@@ -49,7 +45,6 @@ class FakeTextDataGenerator(object):
         word_split,
         image_dir,
     ):
-        image = None
 
         margin_top, margin_left, margin_bottom, margin_right = margins
         horizontal_margin = margin_left + margin_right
@@ -183,21 +178,4 @@ class FakeTextDataGenerator(object):
         )
         final_image = background_img.filter(gaussian_filter)
 
-        #####################################
-        # Generate name for resulting image #
-        #####################################
-        if name_format == 0:
-            image_name = "{}_{}.{}".format(text, str(index), extension)
-        elif name_format == 1:
-            image_name = "{}_{}.{}".format(str(index), text, extension)
-        elif name_format == 2:
-            image_name = "{}.{}".format(str(index), extension)
-        else:
-            print("{} is not a valid name format. Using default.".format(name_format))
-            image_name = "{}_{}.{}".format(text, str(index), extension)
-
-        # Save the image
-        if out_dir is not None:
-            final_image.convert("RGB").save(os.path.join(out_dir, image_name))
-        else:
-            return final_image.convert("RGB")
+        return final_image.convert('RGB'), text
