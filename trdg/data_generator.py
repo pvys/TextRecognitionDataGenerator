@@ -149,13 +149,13 @@ class FakeTextDataGenerator(object):
 
         new_text_height, new_text_width = resized_img.shape[:2]
         if alignment == 0 or width == -1:
-            background_img[margin_top: margin_top + new_text_height, margin_left: margin_left + new_text_width, :] = resized_img
+            background_img[margin_top: margin_top + new_text_height, margin_left: margin_left + new_text_width, :][resized_img != 0] = resized_img[resized_img != 0]
         elif alignment == 1:
             left_from = int(background_width / 2 - new_text_width / 2)
-            background_img[margin_top: margin_top + new_text_height, left_from: left_from + new_text_width] = resized_img
+            background_img[margin_top: margin_top + new_text_height, left_from: left_from + new_text_width][resized_img != 0] = resized_img[resized_img != 0]
         else:
             left_from = background_width - new_text_width - margin_right
-            background_img[margin_top: margin_top + new_text_height, left_from: left_from + new_text_width] = resized_img
+            background_img[margin_top: margin_top + new_text_height, left_from: left_from + new_text_width][resized_img != 0] = resized_img[resized_img != 0]
 
         ##################################
         # Apply gaussian blur #
@@ -168,8 +168,5 @@ class FakeTextDataGenerator(object):
         else:
             final_image = cv2.GaussianBlur(background_img, (radius, radius), 0)
 
-        import uuid
-        import os
-        cv2.imwrite(os.path.join('imgs',uuid.uuid4().hex + '.jpg'), final_image)
         return final_image, text
 
