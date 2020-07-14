@@ -86,7 +86,7 @@ def sin(image, vertical=False, horizontal=False):
     )
 
 
-def cos(image, mask, vertical=False, horizontal=False):
+def cos(image, vertical=False, horizontal=False):
     """
         Apply a cosine distorsion on one or both of the specified axis
     """
@@ -95,7 +95,6 @@ def cos(image, mask, vertical=False, horizontal=False):
 
     return _apply_func_distorsion(
         image,
-        mask,
         vertical,
         horizontal,
         max_offset,
@@ -103,7 +102,7 @@ def cos(image, mask, vertical=False, horizontal=False):
     )
 
 
-def random(image, mask, vertical=False, horizontal=False):
+def random(image, vertical=False, horizontal=False):
     """
         Apply a random distorsion on one or both of the specified axis
     """
@@ -112,7 +111,6 @@ def random(image, mask, vertical=False, horizontal=False):
 
     return _apply_func_distorsion(
         image,
-        mask,
         vertical,
         horizontal,
         max_offset,
