@@ -43,7 +43,7 @@ class FakeTextDataGenerator(object):
         margins,
         fit,
         word_split,
-        image_dir,
+        image_path,
     ):
 
         margin_top, margin_left, margin_bottom, margin_right = margins
@@ -145,7 +145,7 @@ class FakeTextDataGenerator(object):
             )
         else:
             background_img = background_generator.image(
-                background_height, background_width, image_dir
+                background_height, background_width, image_path
             )
 
         #############################
