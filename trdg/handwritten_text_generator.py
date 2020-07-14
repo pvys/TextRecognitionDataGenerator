@@ -227,10 +227,9 @@ def generate(text, text_color):
 
             s, (width, height) = canvas.print_to_buffer()
             image = Image.frombytes("RGBA", (width, height), s)
-            mask = Image.new("RGB", (width, height), (0, 0, 0))
 
             images.append(_crop_white_borders(image))
 
             plt.close()
 
-        return _join_images(images), mask
+        return _join_images(images)
