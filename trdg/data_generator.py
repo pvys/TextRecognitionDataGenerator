@@ -168,5 +168,8 @@ class FakeTextDataGenerator(object):
         else:
             final_image = cv2.GaussianBlur(background_img, (radius, radius), 0)
 
+        import uuid
+        import os
+        cv2.imwrite(os.path.join('imgs',uuid.uuid4().hex + '.jpg'), final_image)
         return final_image, text
 
