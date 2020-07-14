@@ -7,21 +7,19 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 
 
-def _apply_func_distorsion(image, mask, vertical, horizontal, max_offset, func):
+def _apply_func_distorsion(image, vertical, horizontal, max_offset, func):
     """
         Apply a distorsion to an image
     """
 
     # Nothing to do!
     if not vertical and not horizontal:
-        return image, mask
+        return image
 
     # FIXME: From looking at the code I think both are already RGBA
     rgb_image = image.convert("RGBA")
-    rgb_mask = mask.convert("RGB")
 
     img_arr = np.array(rgb_image)
-    mask_arr = np.array(rgb_mask)
 
     vertical_offsets = [func(i) for i in range(img_arr.shape[1])]
     horizontal_offsets = [
@@ -46,17 +44,6 @@ def _apply_func_distorsion(image, mask, vertical, horizontal, max_offset, func):
 
     new_img_arr_copy = np.copy(new_img_arr)
 
-    new_mask_arr = np.zeros(
-        (
-            # I keep img_arr to maximise the chance of
-            # a breakage if img and mask don't match
-            img_arr.shape[0] + (2 * max_offset if vertical else 0),
-            img_arr.shape[1] + (2 * max_offset if horizontal else 0),
-            3,
-        )
-    )
-
-    new_mask_arr_copy = np.copy(new_mask_arr)
 
     if vertical:
         column_height = img_arr.shape[0]
@@ -65,9 +52,6 @@ def _apply_func_distorsion(image, mask, vertical, horizontal, max_offset, func):
             new_img_arr[
                 max_offset + o : column_height + max_offset + o, column_pos, :
             ] = img_arr[:, i, :]
-            new_mask_arr[
-                max_offset + o : column_height + max_offset + o, column_pos, :
-            ] = mask_arr[:, i, :]
 
     if horizontal:
         row_width = img_arr.shape[1]
@@ -76,28 +60,17 @@ def _apply_func_distorsion(image, mask, vertical, horizontal, max_offset, func):
                 new_img_arr_copy[
                     i, max_offset + o : row_width + max_offset + o, :
                 ] = new_img_arr[i, max_offset : row_width + max_offset, :]
-                new_mask_arr_copy[
-                    i, max_offset + o : row_width + max_offset + o, :
-                ] = new_mask_arr[i, max_offset : row_width + max_offset, :]
             else:
                 new_img_arr[
                     i, max_offset + o : row_width + max_offset + o, :
                 ] = img_arr[i, :, :]
-                new_mask_arr[
-                    i, max_offset + o : row_width + max_offset + o, :
-                ] = mask_arr[i, :, :]
 
-    return (
-        Image.fromarray(
+    return Image.fromarray(
             np.uint8(new_img_arr_copy if horizontal and vertical else new_img_arr)
-        ).convert("RGBA"),
-        Image.fromarray(
-            np.uint8(new_mask_arr_copy if horizontal and vertical else new_mask_arr)
-        ).convert("RGB"),
-    )
+        ).convert("RGBA")
 
 
-def sin(image, mask, vertical=False, horizontal=False):
+def sin(image, vertical=False, horizontal=False):
     """
         Apply a sine distorsion on one or both of the specified axis
     """
@@ -106,7 +79,6 @@ def sin(image, mask, vertical=False, horizontal=False):
 
     return _apply_func_distorsion(
         image,
-        mask,
         vertical,
         horizontal,
         max_offset,
