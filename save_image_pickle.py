@@ -177,4 +177,4 @@ def save_pickle2(num=1000, save=False):
 
 if __name__ == '__main__':
     # save_pickle(100)
-    save_pickle2(1000)
+    save_pickle2(1000, True)
