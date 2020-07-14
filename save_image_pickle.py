@@ -1,3 +1,5 @@
+from multiprocessing import Pool
+
 from trdg.data_generator import FakeTextDataGenerator
 import random
 import pickle
@@ -17,12 +19,12 @@ def get_fonts():
 
 
 def get_words():
-    with open(os.path.join(KOR_DICT_DIR,KOR_DICT_FILENAME), 'r', encoding='utf8') as file:
+    with open(os.path.join(KOR_DICT_DIR, KOR_DICT_FILENAME), 'r', encoding='utf8') as file:
         return [string.strip() for string in file.readlines()]
-    
+
 
 def get_chars():
-    with open(os.path.join(KOR_STRING_DIR,KOR_STRING_FILENAME), 'r', encoding='utf8') as file:
+    with open(os.path.join(KOR_STRING_DIR, KOR_STRING_FILENAME), 'r', encoding='utf8') as file:
         return [ch for ch in file.read().strip()]
 
 
@@ -84,92 +86,95 @@ def get_strings_to_generate(lengths):
 def save_pickle(num=1000):
     st = time.time()
     string_lengths = get_random_lengths(2, 40, num)
-    strings = get_strings_to_generate(string_lengths) 
+    strings = get_strings_to_generate(string_lengths)
     fonts = [random.choice(FONTS) for _ in range(num)]
     sizes = [add_noise_to_number(random.choice(range(32, 202, 17))) for _ in range(num)]
     colors = get_random_colors(num)
 
     stack = []
-    for tup in zip( 
-           [i for i in range(num)],
-           strings,
-           fonts,
-           [None] * num,
-           sizes,
-           [None] * num,
-           [0] * num,
-           [False] * num,
-           [3] * num,
-           [True] * num,
-           [random.choice([0,1,3,4]) for _ in range(num)],
-           [0] * num,
-           [0] * num,
-           [False] * num,
-           [0] * num,
-           [-1] * num,
-           [1] * num,
-           colors,
-           [0] * num,
-           [1.0] * num,
-           [random.randint(0, 3) for _ in range(num)],
-           [(5, 5, 5, 5)] * num,
-           [False] * num,
-           [False] * num,
-           [False] * num,
-           [IMAGE_DIR] * num,
-       ):
+    for tup in zip(
+            [i for i in range(num)],
+            strings,
+            fonts,
+            [None] * num,
+            sizes,
+            [None] * num,
+            [0] * num,
+            [False] * num,
+            [3] * num,
+            [True] * num,
+            [random.choice([0, 1, 3, 4]) for _ in range(num)],
+            [0] * num,
+            [0] * num,
+            [False] * num,
+            [0] * num,
+            [-1] * num,
+            [1] * num,
+            colors,
+            [0] * num,
+            [1.0] * num,
+            [random.randint(0, 3) for _ in range(num)],
+            [(5, 5, 5, 5)] * num,
+            [False] * num,
+            [False] * num,
+            [False] * num,
+            [IMAGE_DIR] * num,
+    ):
         stack.append(FakeTextDataGenerator.generate_from_tuple(tup))
     stack_in_bytes = pickle.dumps(stack)
     print(time.time() - st)
     return stack_in_bytes
 
 
-def save_pickle2(num=1000):
+def save_pickle2(num=1000, save=False):
     st = time.time()
-    fonts = get_fonts()
-    cnt = num
-    strings = ['박박'] * cnt
-    fonts = [fonts[0]] * cnt
-    sizes = [60] * cnt
-    colors = ['#000000'] * cnt
+
+    string_lengths = get_random_lengths(2, 40, num)
+    strings = get_strings_to_generate(string_lengths)
+    fonts = [random.choice(FONTS) for _ in range(num)]
+    sizes = [add_noise_to_number(random.choice(range(32, 202, 17))) for _ in range(num)]
+    colors = get_random_colors(num)
 
     stack = []
-    for tup in zip( 
-           strings,
-           fonts,
-           sizes,
-           [0] * num,
-           [False] * num,
-           [3] * num,
-           [True] * num,
-           [3 for _ in range(num)],
-           [0] * num,
-           [0] * num,
-           [False] * num,
-           [-1] * num,
-           [1] * num,
-           colors,
-           [0] * num,
-           [1.0] * num,
-           [random.randint(0, 3) for _ in range(num)],
-           [(5, 5, 5, 5)] * num,
-           [False] * num,
-           [False] * num,
-           [IMAGE_PATHS[0]] * num,
-           #[random.choice(IMAGE_PATHS) for _ in range(num)],
-           #[os.path.join(IMAGE_DIR, 'img_1279_mv_1_002.jpg')] * num,
-           #[random.choice(IMAGE_PATHS) for _ in range(num)],
-       ):
-        #try:
-            stack.append(FakeTextDataGenerator.generate_from_tuple(tup))
-        #except Exception as e:
-        #    print(str(e))
-        #    print(tup)
-    #print(stack)
+    p = Pool(8)
+    for res in p.imap_unordered(
+        FakeTextDataGenerator.generate_from_tuple,
+        zip(
+            strings,
+            fonts,
+            sizes,
+            [0] * num,
+            [False] * num,
+            [3] * num,
+            [True] * num,
+            [3 for _ in range(num)],
+            [0] * num,
+            [0] * num,
+            [False] * num,
+            [-1] * num,
+            [1] * num,
+            colors,
+            [0] * num,
+            [1.0] * num,
+            [random.randint(0, 3) for _ in range(num)],
+            [(5, 5, 5, 5)] * num,
+            [False] * num,
+            [False] * num,
+            [IMAGE_PATHS[0]] * num,
+            # [random.choice(IMAGE_PATHS) for _ in range(num)],
+            # [os.path.join(IMAGE_DIR, 'img_1279_mv_1_002.jpg')] * num,
+            # [random.choice(IMAGE_PATHS) for _ in range(num)],
+            [save] * num
+        )
+    ):
+        stack.append(res)
+    p.terminate()
+    print(stack, len(stack))
     stack_in_bytes = pickle.dumps(stack)
     print(time.time() - st)
     return stack_in_bytes
 
+
 if __name__ == '__main__':
-    #save_pickle(100)
+    # save_pickle(100)
     save_pickle2(1000)

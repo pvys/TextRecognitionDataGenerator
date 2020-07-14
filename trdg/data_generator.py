@@ -44,6 +44,7 @@ class FakeTextDataGenerator(object):
         fit,
         word_split,
         image_path,
+        to_save
     ):
 
         margin_top, margin_left, margin_bottom, margin_right = margins
@@ -176,6 +177,11 @@ class FakeTextDataGenerator(object):
         gaussian_filter = ImageFilter.GaussianBlur(
             radius=blur if not random_blur else rnd.randint(0, blur)
         )
-        final_image = background_img.filter(gaussian_filter)
+        final_image = background_img.filter(gaussian_filter).convert('RGB')
 
-        return final_image.convert('RGB'), text
+        if to_save:
+            import uuid
+            import os
+            final_image.save(os.path.join('imgs', uuid.uuid4().hex + '.jpg'))
+
+        return final_image, text
