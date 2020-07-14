@@ -18,7 +18,7 @@ class FakeTextDataGenerator(object):
             Same as generate, but takes all parameters as one tuple
         """
 
-        cls.generate(*t)
+        return cls.generate(*t)
 
     @classmethod
     def generate(
